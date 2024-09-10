@@ -1,0 +1,83 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import binom, poisson
+
+# Data from the experiments
+data = {
+    '4.0': [615, 206, 33, 2, 0, 0],
+    '3.5': [604, 339, 94, 11, 2, 0],
+    '0.0': [332, 126, 21, 1, 0, 0],
+    '2.0': [573, 443, 154, 28, 2, 0],
+    '6.5': [172, 176, 89, 12, 1, 0],
+    '3.0': [80, 224, 200, 32, 4, 0]
+}
+
+# Function to calculate mean and variance from empirical data
+def calculate_mean_variance(counts):
+    total_counts = np.array(counts)
+    n = np.sum(total_counts)  # total number of trials
+    k = np.arange(len(total_counts))  # number of events
+    m = np.sum(k * total_counts) / n  # mean
+    variance = np.sum((k - m)**2 * total_counts) / n  # variance
+    return m, variance
+
+# Function to calculate the parameters and predicted distributions
+def binomial_poisson_fit(data):
+    results = {}
+    for temp, counts in data.items():
+        m, variance = calculate_mean_variance(counts)
+        if variance > 0:
+            p = (variance - m) / (m - variance)
+            n = m / p
+            
+            # Binomial distribution probabilities
+            k = np.arange(len(counts))
+            binom_probs = binom.pmf(k, n, p)
+            
+            # Poisson distribution probabilities
+            poisson_probs = poisson.pmf(k, m)
+            
+            # Empirical probabilities
+            total_trials = np.sum(counts)
+            empirical_probs = np.array(counts) / total_trials
+            
+            results[temp] = {
+                'empirical': empirical_probs,
+                'binomial': binom_probs,
+                'poisson': poisson_probs,
+                'k': k
+            }
+        else:
+            results[temp] = {
+                'empirical': np.array(counts) / np.sum(counts),
+                'binomial': None,
+                'poisson': None,
+                'k': np.arange(len(counts))
+            }
+    return results
+
+# Calculate distributions
+distributions = binomial_poisson_fit(data)
+
+# Plot the results
+fig, axs = plt.subplots(len(data), 1, figsize=(10, 15), sharex=True)
+
+for i, (temp, dist) in enumerate(distributions.items()):
+    k = dist['k']
+    empirical = dist['empirical']
+    binomial = dist['binomial']
+    poisson = dist['poisson']
+    
+    axs[i].bar(k - 0.2, empirical, width=0.2, label='Empirical', color='blue', align='center')
+    if binomial is not None:
+        axs[i].plot(k, binomial, 'r-', label='Binomial', markersize=8)
+    if poisson is not None:
+        axs[i].plot(k, poisson, 'g--', label='Poisson', markersize=8)
+        
+    axs[i].set_title(f'Temperature: {temp} °C')
+    axs[i].set_ylabel('Probability')
+    axs[i].legend()
+
+axs[-1].set_xlabel('Number of Events')
+plt.tight_layout()
+plt.show()
