@@ -1,0 +1,44 @@
+import math
+
+# Define parameters
+n = 14  # Total number of quanta
+k = 8   # Observed number of quanta released
+
+# Function to calculate binomial probability
+def binomial_probability(n, k, p):
+    # Binomial coefficient
+    binom_coeff = math.comb(n, k)
+    # Probability of k successes
+    prob = binom_coeff * (p ** k) * ((1 - p) ** (n - k))
+    return prob
+
+# Define the range of probabilities to test (from 0.1 to 1.0 in steps of 0.1)
+probabilities = [i / 10.0 for i in range(1, 11)]
+
+# Calculate and store the likelihoods for each probability
+likelihoods = {}
+for p in probabilities:
+    likelihoods[p] = binomial_probability(n, k, p)
+
+# Find the probability that maximizes the likelihood
+max_likelihood_prob = max(likelihoods, key=likelihoods.get)
+
+# Print the results
+print("Likelihood of observing exactly 8 quanta released for various probabilities:")
+for p, likelihood in likelihoods.items():
+    print(f"Release probability {p:.1f}: Likelihood = {likelihood:.6f}")
+
+print(f"\nMost probable release probability based on the observation: {max_likelihood_prob:.1f}")
+Likelihood of observing exactly 8 quanta released for various probabilities:
+Release probability 0.1: Likelihood = 0.000016
+Release probability 0.2: Likelihood = 0.002015
+Release probability 0.3: Likelihood = 0.023180
+Release probability 0.4: Likelihood = 0.091821
+Release probability 0.5: Likelihood = 0.183289
+Release probability 0.6: Likelihood = 0.206598
+Release probability 0.7: Likelihood = 0.126202
+Release probability 0.8: Likelihood = 0.032244
+Release probability 0.9: Likelihood = 0.001293
+Release probability 1.0: Likelihood = 0.000000
+
+Most probable release probability based on the observation: 0.6
