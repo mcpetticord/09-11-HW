@@ -1,0 +1,25 @@
+from scipy.stats import binom
+
+# Given parameters
+n = 14  # number of available quanta
+p = 0.3  # true release probability under the null hypothesis
+observed_events = 7  # number of observed quantal events
+
+# Compute the probability of observing exactly 'observed_events' quantal events
+prob_exact = binom.pmf(observed_events, n, p)
+
+# Compute the probability of observing 'observed_events' or more quantal events
+prob_at_least = binom.sf(observed_events - 1, n, p)
+
+print(f"Probability of observing exactly {observed_events} quantal events: {prob_exact:.6f}")
+print(f"Probability of observing {observed_events} or more quantal events: {prob_at_least:.6f}")
+
+# Conclusion based on a significance level
+alpha = 0.05  # significance level
+if prob_at_least < alpha:
+    print("The result is statistically significant. Temperature may have had an effect.")
+else:
+    print("The result is not statistically significant. No evidence that temperature had an effect.")
+Probability of observing exactly 7 quantal events: 0.061813 (Null Hypothesis of no effect)
+Probability of observing 7 or more quantal events: 0.093282 (Null hypotheis were true)
+The result is not statistically significant. No evidence that temperature had an effect.
