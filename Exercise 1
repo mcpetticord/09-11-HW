@@ -1,0 +1,34 @@
+Exercise 1
+import math
+
+# Parameters
+n = 10  # Total number of quanta
+p = 0.2  # Probability of releasing a quantum
+
+# Function to calculate binomial probability
+def binomial_probability(n, k, p):
+    # Binomial coefficient
+    binom_coeff = math.comb(n, k)
+    # Probability of k successes
+    prob = binom_coeff * (p ** k) * ((1 - p) ** (n - k))
+    return prob
+
+# Calculate and print probabilities for 0 to 10 quanta
+probabilities = {}
+for k in range(n + 1):
+    probabilities[k] = binomial_probability(n, k, p)
+
+# Print the results
+for k, prob in probabilities.items():
+    print(f"Probability of {k} quanta being released: {prob:.4f}")
+Probability of 0 quanta being released: 0.1074
+Probability of 1 quanta being released: 0.2684
+Probability of 2 quanta being released: 0.3020
+Probability of 3 quanta being released: 0.2013
+Probability of 4 quanta being released: 0.0881
+Probability of 5 quanta being released: 0.0264
+Probability of 6 quanta being released: 0.0055
+Probability of 7 quanta being released: 0.0008
+Probability of 8 quanta being released: 0.0001
+Probability of 9 quanta being released: 0.0000
+Probability of 10 quanta being released: 0.0000
