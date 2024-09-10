@@ -1,0 +1,56 @@
+import math
+import numpy as np
+from scipy.optimize import minimize
+
+# Data from experiments
+measured_releases = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14])
+counts = np.array([0, 0, 3, 7, 10, 19, 26, 16, 16, 5, 5, 0, 0, 0, 0])
+
+# Number of experiments
+N = sum(counts)
+
+# Binomial probability function
+def binomial_probability(n, k, p):
+    if p < 0 or p > 1:
+        return 0
+    # Binomial coefficient
+    binom_coeff = math.comb(n, k)
+    # Probability of k successes
+    prob = binom_coeff * (p ** k) * ((1 - p) ** (n - k))
+    return prob
+
+# Likelihood function
+def likelihood(p):
+    likelihood_value = 1.0
+    for k, count in zip(measured_releases, counts):
+        prob = binomial_probability(N, k, p)
+        likelihood_value *= prob ** count
+    return likelihood_value
+
+# Calculate likelihoods for probabilities from 0 to 1 in steps of 0.01
+probabilities = np.linspace(0.01, 0.99, 99)
+likelihoods = np.array([likelihood(p) for p in probabilities])
+
+# Find the most likely value of p
+max_likelihood_prob = probabilities[np.argmax(likelihoods)]
+
+print(f"Most probable release probability based on likelihood: {max_likelihood_prob:.2f}")
+
+# BONUS: Use a fitting procedure to find "p hat"
+# Negative log-likelihood function for optimization
+def neg_log_likelihood(p):
+    ll = 0
+    for k, count in zip(measured_releases, counts):
+        prob = binomial_probability(N, k, p)
+        if prob > 0:
+            ll -= count * np.log(prob)
+    return ll
+
+# Perform the optimization
+result = minimize(neg_log_likelihood, x0=[0.5], bounds=[(0, 1)])
+p_hat = result.x[0]
+
+print(f"Estimated p hat using fitting procedure: {p_hat:.2f}")
+
+Most probable release probability based on likelihood: 0.06
+Estimated p hat using fitting procedure: 0.00
